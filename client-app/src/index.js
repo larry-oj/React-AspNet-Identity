@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import Homepage from './Homepage';
-import Login from './Login';
+import Login, { loader as loginLoader } from './Login';
+import Logout, { loader as logoutLoader } from './Logout';
+import Dashboard, { loader as dashboardLoader } from './Dashboard';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -19,9 +21,20 @@ const router = createBrowserRouter([
         element: <Homepage />,
       },
       {
+        path: "dashboard",
+        element: <Dashboard />,
+        loader: dashboardLoader,
+      },
+      {
         path: "login",
         element: <Login />,
-      }
+        loader: loginLoader,
+      },
+      {
+        path: "logout",
+        element: <Logout />,
+        loader: logoutLoader,
+      },
     ],
   },
 ]);
