@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using React_AspNet_Identity.Data;
+using React_AspNet_Identity.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,16 @@ builder.Services.AddDbContext<BackendContext>(ops =>
 {
     ops.UseNpgsql(builder.Configuration.GetSection("DatabaseConnection").Value);
 });
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+}).AddEntityFrameworkStores<BackendContext>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
