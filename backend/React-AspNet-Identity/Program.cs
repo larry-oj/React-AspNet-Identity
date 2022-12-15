@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using React_AspNet_Identity.Data;
 using React_AspNet_Identity.Data.Models;
@@ -19,6 +20,17 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
 }).AddEntityFrameworkStores<BackendContext>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+        options.SlidingExpiration = true;
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+    });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -36,6 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using React_AspNet_Identity.Data;
 using React_AspNet_Identity.Data.Models;
@@ -6,6 +8,7 @@ using React_AspNet_Identity.Models;
 
 namespace React_AspNet_Identity.Controllers;
 
+[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("[controller]")]
 public class BooksController : ControllerBase

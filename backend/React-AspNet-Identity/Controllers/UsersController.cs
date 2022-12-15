@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using React_AspNet_Identity.Data.Models;
 using React_AspNet_Identity.Models;
@@ -14,6 +18,44 @@ public class UsersController : ControllerBase
     public UsersController(UserManager<ApplicationUser> userManager)
     {
         _userManager = userManager;
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> Authenticate(AuthenticationRequest user)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        if (await _userManager.FindByNameAsync(user.UserName) is not { } foundUser)
+            return BadRequest("Credentials are not valid");
+        
+        if (!await _userManager.CheckPasswordAsync(foundUser, user.Password))
+            return BadRequest("Credentials are not valid");
+        
+        var claims = new List<Claim>
+        {
+            new (ClaimTypes.Email, foundUser.Email),
+            new (ClaimTypes.NameIdentifier, foundUser.UserName),
+            new (ClaimTypes.Role, "User")
+        };
+        
+        var claimsIdentity = new ClaimsIdentity(
+            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var authProperties = new AuthenticationProperties
+        {
+            AllowRefresh = true,
+            IsPersistent = true,
+            IssuedUtc = DateTimeOffset.UtcNow
+        };
+        
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme, 
+            new ClaimsPrincipal(claimsIdentity), 
+            authProperties);
+        
+        return Ok();
     }
 
     [HttpPost]
@@ -34,6 +76,7 @@ public class UsersController : ControllerBase
         return CreatedAtAction("GetUser", new { username = user.UserName }, user);
     }
     
+    [Authorize(CookieAuthenticationDefaults.AuthenticationScheme)]
     [HttpGet("{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
