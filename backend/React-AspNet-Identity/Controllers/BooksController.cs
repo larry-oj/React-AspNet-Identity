@@ -8,7 +8,7 @@ using React_AspNet_Identity.Models;
 
 namespace React_AspNet_Identity.Controllers;
 
-[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class BooksController : ControllerBase

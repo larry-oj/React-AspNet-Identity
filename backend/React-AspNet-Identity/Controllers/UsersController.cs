@@ -76,7 +76,7 @@ public class UsersController : ControllerBase
         return CreatedAtAction("GetUser", new { username = user.UserName }, user);
     }
     
-    [Authorize(CookieAuthenticationDefaults.AuthenticationScheme)]
+    [Authorize]
     [HttpGet("{username}")]
     public async Task<IActionResult> GetUser(string username)
     {
