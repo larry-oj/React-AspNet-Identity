@@ -35,7 +35,8 @@ class AuthService {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify(requestBody),
+            credentials: "include"
         });
 
         if (response.status !== 200) {
@@ -57,10 +58,13 @@ class AuthService {
     }
 
     async getData() {
+        // send a cross origin cookie request to the server using fetch
         const response = await fetch(`${this.apiUrl}/Auth`, {
             method: "GET",
+            origin: "http://localhost:3000",
             credentials: "include"
         });
+
 
         if (response.status !== 200) {
             if (response.status === 401) {
