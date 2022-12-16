@@ -1,11 +1,15 @@
 import { redirect, useLoaderData } from 'react-router-dom';
-import authService from './authService';
+import authService from './services/auth.service';
 
 export async function loader() {
-    if (authService.isAuthenticated() === false) {
-        return redirect("/login");
+    try {
+        return await authService.getData();
     }
-    return await authService.getData();
+    catch (e) {
+        if (e.message === "Unauthorized")
+            return redirect("/login");
+        throw e;
+    }
 }
 
 export default function Dashboard() {

@@ -1,10 +1,10 @@
 import { React, useState } from 'react';
 import { redirect, useNavigate } from 'react-router-dom';
-import authService from './authService';
+import authService from './services/auth.service';
 
 
 export async function loader() {
-    if (authService.isAuthenticated()) {
+    if (authService.isAuthenticated) {
         return redirect("/");
     }
     return {};
@@ -27,8 +27,8 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", width: 300, alignItems: "flex-end" }}>
                 <label>
                     Username:
                     <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
