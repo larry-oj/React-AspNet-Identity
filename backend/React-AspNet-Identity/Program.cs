@@ -31,6 +31,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
     });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .WithMethods("GET", "POST", "PUT", "DELETE")
+            .AllowCredentials()
+            .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -48,6 +58,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+app.Use((context, next) =>
+{
+    if (!context.Request.Headers.Any(k => k.Key.Contains("Origin")) || context.Request.Method != "OPTIONS")
+        return next.Invoke();
+    context.Response.StatusCode = 200;
+    return context.Response.WriteAsync("handled");
+});
 app.UseAuthentication();
 app.UseAuthorization();
 

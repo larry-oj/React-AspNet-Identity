@@ -1,8 +1,10 @@
-import authService from "./authService";
+import authService from "./services/auth.service";
 import { redirect } from "react-router-dom";
 
 export async function loader() {
-    await authService.logout();
+    if (authService.isAuthenticated) {
+        await authService.logout();
+    }
     return redirect("/");
 }
 

@@ -11,18 +11,18 @@ namespace React_AspNet_Identity.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UsersController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public UsersController(UserManager<ApplicationUser> userManager)
+    public AuthController(UserManager<ApplicationUser> userManager)
     {
         _userManager = userManager;
     }
 
     [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> Authenticate(AuthenticationRequest user)
+    public async Task<IActionResult> Login(AuthenticationRequest user)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
         var claims = new List<Claim>
         {
             new (ClaimTypes.Email, foundUser.Email),
-            new (ClaimTypes.NameIdentifier, foundUser.UserName),
+            new (ClaimTypes.Name, foundUser.UserName),
             new (ClaimTypes.Role, "User")
         };
         
@@ -59,7 +59,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostUser(User user)
+    [Route("[action]")]
+    public async Task<IActionResult> Register(User user)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -77,10 +78,20 @@ public class UsersController : ControllerBase
     }
     
     [Authorize]
-    [HttpGet("{username}")]
-    public async Task<IActionResult> GetUser(string username)
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> Logout()
     {
-        var user = await _userManager.FindByNameAsync(username);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok();
+    }
+    
+    
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetUser()
+    {
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
 
         if (user == null)
             return NotFound();
